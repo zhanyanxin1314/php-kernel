@@ -11,4 +11,43 @@ zend
 ext
   php扩展目录, tsrm 为线程安全相关的实现
   
-1.2 
+1.2 生命周期
+
+ 1.2.1 模块初始化阶段(module startup)
+ 
+   zeng 引擎初始化阶段,入口函数为php_module_startup() 位于main目录下面 main.c里面
+   
+   主要处理包括如下
+   
+      激活sapi : sapi_activate() 初始化请求信息 设置post请求得handler 在module_startup阶段处理完成后调用 sapi_deactivate()
+      
+      启动php输出  php_output_startup()
+      
+      初始化垃圾回收期 gc_globals_ctor() 分配zend_gc_globals内存
+      
+      启动zend引擎 zend_startup() 主要操作如下
+        
+         启动内存池 start_memory_manager()
+         
+         设置zend 虚拟机编译 执行器得函数句柄 (zend_compile_file)
+         
+         注册zend核心扩展 zend_startup_builtin_functions() 这个扩展是内核提供, 注册strlen,define,class_exists等函数
+         
+         解析php.ini 配置保存在configuration_hash哈希表中
+         
+         注册静态扩展
+         
+         注册动态扩展 php_ini_register_extension() 将php.ini中得扩展加载到php中
+         
+ 请求初始化阶段(request startup)
+     
+ 
+ 执行脚本阶段(execute script)
+ 
+     解释php代码，执行器执行解释过得可识别得指令
+ 
+ 请求关闭阶段(request shutdown)
+ 
+      将flush输出内容,发送http应答head头,清理全局变量,关闭编译器,关闭执行器
+      
+ 模块关闭阶段(module shutdown)
