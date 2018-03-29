@@ -8,4 +8,23 @@
       数据类型
   2.2 zeng_val 结构比较简单,是一个联合体, 各类型根据自己的类型选择使用不同的成员,整数,浮点型直接存储在zend_value中,其他类型则是指针,指向具体类型的结
      构,如下
- 
+     
+     typedef union _zend_value {
+        zend_long         lval;                         /* long value */
+        double            dval;                         /* double value */
+        zend_refcounted  *counted;
+        zend_string      *str;
+        zend_array       *arr;
+        zend_object      *obj;
+        zend_resource    *res;
+        zend_reference   *ref;
+        zend_ast_ref     *ast;
+        zval             *zv;
+        void             *ptr;
+        zend_class_entry *ce;
+        zend_function    *func;
+        struct {
+                uint32_t w1;
+                uint32_t w2;
+        } ww;
+      } zend_value;
